@@ -4,6 +4,25 @@
 include drd.inc
 includelib drd.lib
 
+;INCLUDE \masm32\include\windows.inc
+INCLUDE \masm32\include\kernel32.inc
+;INCLUDE \masm32\include\user32.inc
+;INCLUDE \masm32\include\advapi32.inc
+INCLUDE \masm32\include\msvcrt.inc
+;INCLUDE \masm32\include\masm32.inc
+INCLUDE \masm32\include\DateTime.inc
+
+;INCLUDE \masm32\macros\macros.asm
+
+;INCLUDELIB \masm32\lib\kernel32.lib
+;INCLUDELIB \masm32\lib\user32.lib
+;INCLUDELIB \masm32\lib\advapi32.lib
+INCLUDELIB \masm32\lib\msvcrt.lib
+;INCLUDELIB \masm32\lib\masm32.lib
+INCLUDELIB \masm32\lib\DateTime.lib
+include \masm32\include\user32.inc
+include \masm32\include\gdi32.inc
+
 .data 
 pngBoard BYTE "backgammon.bmp",0
 pngBlack BYTE "black.bmp",0
@@ -27,6 +46,24 @@ white DWORD 0,0,0,0,0,5,0,3,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,2
 black DWORD 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, 0
 dstX1 DWORD 0
 dstY1 DWORD 0
+cubeValue1  BYTE 0
+cubeValue2  BYTE 0
+
+GetLocalTime PROTO :DWORD
+.data
+LPSYSTEMTIME STRUCT
+    wYear       WORD ?
+    wMonth      WORD ?
+    wDayOfWeek  WORD ?
+    wDay        WORD ?
+    wHour       WORD ?
+    wMinute     WORD ?
+    wSecond     WORD ?
+    wMilliseconds WORD ?
+LPSYSTEMTIME ENDS
+
+localTime LPSYSTEMTIME <>
+
 .code
 
 
@@ -127,7 +164,7 @@ drawBlackSoldiers PROC
 	
 	checkblack4:
 		cmp eax, 24
-		je exit
+		je exitblack
 		mov ecx, black[eax*4]
 		mov ebx, ecx
 		imul ebx, 75
@@ -156,9 +193,7 @@ drawBlackSoldiers PROC
 		mov edx, 0
 		add eax, 1
 		jmp checkblack4
-	
-
-	exit:
+	exitblack:
 		ret
 drawBlackSoldiers ENDP
 
@@ -184,7 +219,7 @@ drawWhiteSoldiers PROC
 		push eax
 		cmp ebx, 60
 		jl addwhite1
-		invoke drd_imageDraw, offset objwhite, dstX1, ebx
+		invoke drd_imageDraw, offset objWhite, dstX1, ebx
 		sub ebx, 75
 		pop eax
 		jmp drawwhitesoldiers1		
@@ -214,7 +249,7 @@ drawWhiteSoldiers PROC
 		push eax
 		cmp ebx, 60
 		jl addwhite2
-		invoke drd_imageDraw, offset objwhite, dstX1, ebx
+		invoke drd_imageDraw, offset objWhite, dstX1, ebx
 		sub ebx, 75
 		pop eax
 		jmp drawwhitesoldiers2		
@@ -246,7 +281,7 @@ drawWhiteSoldiers PROC
 		push eax
 		cmp ebx, 1000
 		jg addwhite3
-	invoke drd_imageDraw, offset objwhite, dstX1, ebx
+	invoke drd_imageDraw, offset objWhite, dstX1, ebx
 		add ebx, 75
 		pop eax
 		jmp drawwhitesoldiers3		
@@ -278,7 +313,7 @@ drawWhiteSoldiers PROC
 		push eax
 		cmp ebx, 1000
 		jg addwhite4
-	invoke drd_imageDraw, offset objwhite, dstX1, ebx
+	invoke drd_imageDraw, offset objWhite, dstX1, ebx
 		add ebx, 75
 		pop eax
 		jmp drawwhitesoldiers4		
@@ -293,14 +328,123 @@ drawWhiteSoldiers PROC
 		ret
 drawWhiteSoldiers ENDP
 
+
+rollCube PROC
+	invoke GetLocalTime, ADDR localTime  
+	mov ax, localTime.wMilliseconds 
+	mov bl, 167
+	div bl
+	mov cubeValue1, al
+	mov ax, localTime.wMilliseconds 
+	mov bl, 6
+	div bl
+	mov cubeValue2, ah
+	ret
+rollCube ENDP
+
+drawCube1 PROC
+	cmp cubeValue1, 3
+	jl lowFirstCube
+	cmp cubeValue1, 4
+	jl FirstCube4
+	cmp cubeValue1, 5
+	je FirstCube6
+	invoke drd_imageDraw, offset objCube5, 895, 450
+	ret
+	lowFirstCube:
+		cmp cubeValue1, 1
+		jl FirstCube1
+		cmp cubeValue1, 2
+		je FirstCube3
+		push ax
+		invoke drd_imageDraw, offset objCube2, 895, 450
+		pop ax
+		ret
+	FirstCube1: 
+		push ax
+		invoke drd_imageDraw, offset objCube1, 895, 450
+		pop ax
+		ret
+	FirstCube3: 
+		push ax
+		invoke drd_imageDraw, offset objCube3, 895, 450
+		pop ax
+		ret
+	FirstCube4: 
+		push ax
+		invoke drd_imageDraw, offset objCube4, 895, 450
+		pop ax
+		ret
+	FirstCube6: 
+		push ax
+		invoke drd_imageDraw, offset objCube6, 895, 450
+		pop ax
+		ret
+drawCube1 ENDP
+
+drawCube2 PROC
+	cmp cubeValue2, 3
+		jl lowSecondCube
+		cmp cubeValue2, 4
+		jl SecondCube4
+		cmp cubeValue2, 5
+		je SecondCube6
+		invoke drd_imageDraw, offset objCube5, 895, 750
+		ret
+	lowSecondCube:
+		cmp cubeValue2, 1
+		jl SecondCube1
+		cmp cubeValue2, 2
+		je SecondCube3
+		push ax
+		invoke drd_imageDraw, offset objCube2, 895, 750
+		pop ax
+		ret
+	SecondCube1: 
+		push ax
+		invoke drd_imageDraw, offset objCube1, 895, 750
+		pop ax
+		ret
+	SecondCube3: 
+		push ax
+		invoke drd_imageDraw, offset objCube3, 895, 750
+		pop ax
+		ret
+	SecondCube4: 
+		push ax
+		invoke drd_imageDraw, offset objCube4, 895, 750
+		pop ax
+		ret
+	SecondCube6: 
+		push ax
+		invoke drd_imageDraw, offset objCube6, 895, 750
+		pop ax
+		ret
+drawCube2 ENDP
+	
+drawCube PROC
+	invoke drawCube1
+	invoke drawCube2
+	ret
+drawCube ENDP
+	
 drawsoldiers PROC
 	invoke drawBlackSoldiers
 	invoke drawWhiteSoldiers
+	invoke drawCube
 	ret
 drawsoldiers ENDP
 
+handleKey PROC
+    invoke GetAsyncKeyState, 32
+    INVOKE rollCube
+    ret
+
+handleKey ENDP
+
 main proc
 	invoke drd_init, 1920, 1080, 0
+	INVOKE rollCube
 	invoke drd_imageLoadFile,offset pngBoard, offset objBoard
 	invoke drd_imageLoadFile,offset pngCube1, offset objCube1
 	invoke drd_imageLoadFile,offset pngCube2, offset objCube2
@@ -316,6 +460,7 @@ main proc
 		invoke drawsoldiers
 		invoke drd_processMessages
 		invoke drd_flip
+		invoke drd_setKeyHandler, handleKey
 	jmp loopa
 main endp
 END main

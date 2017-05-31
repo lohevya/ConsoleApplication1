@@ -1,3 +1,4 @@
 ﻿  Assembling test.asm...
+drd.lib(DirectDraw.obj) : warning LNK4099: PDB 'drd.pdb' was not found with 'drd.lib(DirectDraw.obj)' or at 'D:\dev\source\ConsoleApplication1\Debug\drd.pdb'; linking object as if no debug info
   ConsoleApplication1.vcxproj -> D:\dev\source\ConsoleApplication1\Debug\ConsoleApplication1.exe
   ConsoleApplication1.vcxproj -> D:\dev\source\ConsoleApplication1\Debug\ConsoleApplication1.pdb (Full PDB)
