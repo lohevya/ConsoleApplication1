@@ -48,7 +48,7 @@ dstX1 DWORD 0
 dstY1 DWORD 0
 cubeValue1  BYTE 0
 cubeValue2  BYTE 0
-
+turn DWORD 0
 GetLocalTime PROTO :DWORD
 .data
 LPSYSTEMTIME STRUCT
@@ -349,7 +349,7 @@ drawCube1 PROC
 	jl FirstCube4
 	cmp cubeValue1, 5
 	je FirstCube6
-	invoke drd_imageDraw, offset objCube5, 895, 450
+	invoke drd_imageDraw, offset objCube5, 900, 450
 	ret
 	lowFirstCube:
 		cmp cubeValue1, 1
@@ -357,27 +357,27 @@ drawCube1 PROC
 		cmp cubeValue1, 2
 		je FirstCube3
 		push ax
-		invoke drd_imageDraw, offset objCube2, 895, 450
+		invoke drd_imageDraw, offset objCube2, 900, 450
 		pop ax
 		ret
 	FirstCube1: 
 		push ax
-		invoke drd_imageDraw, offset objCube1, 895, 450
+		invoke drd_imageDraw, offset objCube1, 900, 450
 		pop ax
 		ret
 	FirstCube3: 
 		push ax
-		invoke drd_imageDraw, offset objCube3, 895, 450
+		invoke drd_imageDraw, offset objCube3, 900, 450
 		pop ax
 		ret
 	FirstCube4: 
 		push ax
-		invoke drd_imageDraw, offset objCube4, 895, 450
+		invoke drd_imageDraw, offset objCube4, 900, 450
 		pop ax
 		ret
 	FirstCube6: 
 		push ax
-		invoke drd_imageDraw, offset objCube6, 895, 450
+		invoke drd_imageDraw, offset objCube6, 900, 450
 		pop ax
 		ret
 drawCube1 ENDP
@@ -389,7 +389,7 @@ drawCube2 PROC
 		jl SecondCube4
 		cmp cubeValue2, 5
 		je SecondCube6
-		invoke drd_imageDraw, offset objCube5, 895, 750
+		invoke drd_imageDraw, offset objCube5, 910, 555
 		ret
 	lowSecondCube:
 		cmp cubeValue2, 1
@@ -397,27 +397,27 @@ drawCube2 PROC
 		cmp cubeValue2, 2
 		je SecondCube3
 		push ax
-		invoke drd_imageDraw, offset objCube2, 895, 750
+		invoke drd_imageDraw, offset objCube2, 910, 555
 		pop ax
 		ret
 	SecondCube1: 
 		push ax
-		invoke drd_imageDraw, offset objCube1, 895, 750
+		invoke drd_imageDraw, offset objCube1, 910, 555
 		pop ax
 		ret
 	SecondCube3: 
 		push ax
-		invoke drd_imageDraw, offset objCube3, 895, 750
+		invoke drd_imageDraw, offset objCube3, 910, 555
 		pop ax
 		ret
 	SecondCube4: 
 		push ax
-		invoke drd_imageDraw, offset objCube4, 895, 750
+		invoke drd_imageDraw, offset objCube4, 910, 555
 		pop ax
 		ret
 	SecondCube6: 
 		push ax
-		invoke drd_imageDraw, offset objCube6, 895, 750
+		invoke drd_imageDraw, offset objCube6, 910, 555
 		pop ax
 		ret
 drawCube2 ENDP
@@ -434,17 +434,31 @@ drawsoldiers PROC
 	invoke drawCube
 	ret
 drawsoldiers ENDP
+playSoldiers PROC
+	mov eax, 0
+	mov al, cubeValue2
+	mov  black[eax*4] , 1
+
+	cmp turn, 1
+	je blackTurn
+	mov turn, 1
+	ret
+	blackTurn:
+		mov turn, 0
+	ret
+playSoldiers ENDP
 
 handleKey PROC
     invoke GetAsyncKeyState, 32
     INVOKE rollCube
+	invoke playSoldiers
     ret
 
 handleKey ENDP
 
 main proc
 	invoke drd_init, 1920, 1080, 0
-	INVOKE rollCube
+	invoke rollCube
 	invoke drd_imageLoadFile,offset pngBoard, offset objBoard
 	invoke drd_imageLoadFile,offset pngCube1, offset objCube1
 	invoke drd_imageLoadFile,offset pngCube2, offset objCube2
