@@ -434,11 +434,60 @@ drawsoldiers PROC
 	invoke drawCube
 	ret
 drawsoldiers ENDP
-playSoldiers PROC
+playBlackSoldiers PROC
 	mov eax, 0
+ 	mov ebx, -1
+	mov edx, 0
+	mov ecx, -1
 	mov al, cubeValue2
-	mov  black[eax*4] , 1
+	mov dl, cubeValue1
+	checkSoldiersBlackCube2:
+		add ebx, 1
+		cmp ebx, 24
+		jg checkSoldiersBlackCube1
+		cmp black[ebx*4], 0
+		jg moveSoldiersBlackCube2
+		jmp checkSoldiersBlackCube2
+	moveSoldiersBlackCube2:
+		add eax, 1
+		add eax, ebx
+		cmp white[eax*4] , 1
+		jg noplaceblackCube2
+			
+		;cmp white[eax*4] , 1
+		;je whiteout
+			;whiteout:
 
+		add black[eax*4] , 1
+		sub black[ebx*4] , 1
+		jmp checkSoldiersBlackCube1
+
+		checkSoldiersBlackCube1:
+		add ecx, 1
+		cmp ecx, 24
+		jg getoutblack
+		cmp black[ecx*4], 0
+		jg moveSoldiersBlackCube1
+		jmp checkSoldiersBlackCube1
+	moveSoldiersBlackCube1:
+		add edx, 1
+		add edx, ecx
+		cmp white[edx*4] , 1
+		jg noplaceblackCube1
+			
+		;cmp white[eax*4] , 1
+		;je whiteout
+			;whiteout:
+
+		add black[edx*4] , 1
+		sub black[ecx*4] , 1
+		jmp getoutblack
+	;je exitblack
+	;jmp checkSoldiersBlack
+	getoutblack:
+		ret
+	;exitblack: 
+	;ret
 	cmp turn, 1
 	je blackTurn
 	mov turn, 1
@@ -446,14 +495,123 @@ playSoldiers PROC
 	blackTurn:
 		mov turn, 0
 	ret
-playSoldiers ENDP
+
+	noplaceblackCube2:
+				mov al, cubeValue2
+				jmp checkSoldiersBlackCube2
+
+	noplaceblackCube1:
+				mov dl, cubeValue1
+				jmp checkSoldiersBlackCube1
+playBlackSoldiers ENDP
+
+playWhiteSoldiers PROC
+	mov eax, 23
+ 	mov ebx, 24
+	mov edx, 23
+	mov ecx, 24
+	mov al, cubeValue2
+	; Cube 2
+	checkSoldiersWhiteCube2:
+		sub ebx, 1
+		cmp ebx, 0
+		jl checkSoldiersWhiteCube1
+		cmp white[ebx*4], 0
+		jg moveSoldiersWhiteCube2
+		jmp checkSoldiersWhiteCube2
+	moveSoldiersWhiteCube2:
+		add eax, 1
+		mov edx, ebx
+		sub edx, eax
+		mov eax, edx
+		cmp black[eax*4] , 1
+		jg noplacewhiteCube2
+		cmp eax, 0
+		jl pushOutWhiteCube2
+		add white[eax*4] , 1
+		pushOutWhiteCube2:
+		sub white[ebx*4] , 1
+		mov dl, cubeValue1
+		jmp checkSoldiersWhiteCube1
+
+	; Cube 1
+	checkSoldiersWhiteCube1:
+		sub ecx, 1
+		cmp ecx, 0
+		jl getoutwhite
+		cmp white[ecx*4], 0
+		jg moveSoldiersWhiteCube1
+		jmp checkSoldiersWhiteCube1
+	moveSoldiersWhiteCube1:
+		add edx, 1
+		mov eax, ecx
+		sub eax, edx
+		mov edx, eax
+		cmp black[edx*4] , 1
+		jg noplacewhiteCube1
+		cmp edx, 0
+		jl pushOutWhiteCube1
+		add white[edx*4] , 1
+		pushOutWhiteCube1:
+		sub white[ecx*4] , 1
+		jmp getoutwhite
+	;je exitwhite
+	;jmp checkSoldiersWhite
+	getoutwhite:
+		ret
+	;exitwhite: 
+	;ret
+	cmp turn, 1
+	je whiteTurn
+	mov turn, 1
+	ret
+	whiteTurn:
+		mov turn, 0
+	ret
+
+	noplacewhiteCube2:
+				mov al, cubeValue2
+				jmp checkSoldiersWhiteCube2
+
+	noplacewhiteCube1:
+				mov dl, cubeValue1
+				jmp checkSoldiersWhiteCube1
+playWhiteSoldiers ENDP
+
 
 handleKey PROC
     invoke GetAsyncKeyState, 32
     INVOKE rollCube
-	invoke playSoldiers
-    ret
 
+	;Check turns
+	cmp turn, 1
+	je whiteTurn
+	mov turn, 1
+	jmp playBlackTurn
+	whiteTurn:
+		mov turn, 0
+		jmp playWhiteTurn
+
+	
+	playBlackTurn:
+	
+		mov al, cubeValue1
+		cmp al, cubeValue2
+		jne playSingleCubeblack
+		invoke playBlackSoldiers
+		playSingleCubeblack:
+			invoke playBlackSoldiers
+		ret
+	playWhiteTurn:
+	
+		mov al, cubeValue1
+		cmp al, cubeValue2
+		jne playSingleCubewhite
+		invoke playWhiteSoldiers
+		playSingleCubewhite:
+			invoke playWhiteSoldiers
+		ret
+		 
 handleKey ENDP
 
 main proc
