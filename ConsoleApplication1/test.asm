@@ -372,9 +372,6 @@ rollCube PROC
 	mov bl, 6
 	div bl
 	mov cubeValue2, ah
-
-	mov cubeValue1, 3
-	mov cubeValue2, 3
 	ret
 rollCube ENDP
 
@@ -503,7 +500,10 @@ playBlackSoldiers PROC
 		jg noplaceblackCube2
 		cmp white[eax*4] , 1
 		je eatwhite1
+		cmp eax, 23
+		jg pushOutBlackCube2
 		add black[eax*4] , 1
+	pushOutBlackCube2:
 		sub black[ebx*4] , 1
 		sub TurnsForCube2, 1
 		mov ebx, -1
@@ -536,10 +536,12 @@ playBlackSoldiers PROC
 			
 		cmp white[edx*4] , 1
 		je eatwhite2
-			
-
+		cmp edx, 23
+		jg pushOutBlackCube1
 		add black[edx*4] , 1
+	pushOutBlackCube1:
 		sub black[ecx*4] , 1
+
 		sub TurnsForCube1, 1
 		mov ecx, -1
 		mov edx, 0
@@ -580,7 +582,7 @@ playBlackSoldiers PROC
 	procceseatenblack:
 		procceseatenblackcube2:
 			add ebx, 1
-			cmp ebx, 7
+			cmp ebx, 5
 			jg procceseatenblackcube1
 			add eax, ebx
 			cmp white[eax*4] , 1
@@ -592,9 +594,7 @@ playBlackSoldiers PROC
 			sub TurnsForCube2, 1
 			cmp BlackEat, 0
 			jg procceseatenblackcube1
-			cmp TurnsForCube2, 0
-			jne checkSoldiersBlackCube2
-			ret
+			jmp checkSoldiersBlackCube2
 
 			eatfromeatenwhite1:
 			add WhitesEat, 1
@@ -602,12 +602,10 @@ playBlackSoldiers PROC
 			add black[eax*4] , 1
 			sub BlackEat, 1
 			sub TurnsForCube2, 1
-			cmp TurnsForCube2, 0
-			je checkSoldiersBlackCube1
-			ret 
+			jmp checkSoldiersBlackCube2
 		procceseatenblackcube1:
 			add ecx, 1
-			cmp ecx, 7
+			cmp ecx, 5
 			jg getoutblack
 			add edx, ecx
 			cmp white[edx*4] , 1
@@ -617,9 +615,7 @@ playBlackSoldiers PROC
 			sub BlackEat, 1
 			add black[edx*4], 1
 			sub TurnsForCube1, 1
-			cmp TurnsForCube2, 0
-			jne checkSoldiersBlackCube1
-			ret
+			jmp checkSoldiersBlackCube2
 	
 			eatfromeatenwhite2:
 			add WhitesEat, 1
@@ -627,9 +623,7 @@ playBlackSoldiers PROC
 			add black[edx*4] , 1
 			sub BlackEat, 1
 			sub TurnsForCube1, 1
-			cmp TurnsForCube1, 0
-			jne checkSoldiersBlackCube1
-			ret 
+			jmp checkSoldiersBlackCube2
 
 	cmp turn, 1
 	je blackTurn
@@ -791,9 +785,7 @@ playWhiteSoldiers PROC
 			sub TurnsForCube2, 1
 			cmp WhitesEat, 0
 			jg procceseatenwhitecube1
-			cmp TurnsForCube2, 0
-			jg checkSoldiersWhiteCube2
-			ret
+			jmp checkSoldiersWhiteCube2
 
 			eatfromeatenblack1:
 			add BlackEat, 1
@@ -801,9 +793,7 @@ playWhiteSoldiers PROC
 			add white[eax*4] , 1
 			sub WhitesEat, 1
 			sub TurnsForCube2, 1
-			cmp TurnsForCube2, 0
-			jg checkSoldiersWhiteCube2
-			ret 
+			jmp checkSoldiersWhiteCube2
 		
 		procceseatenwhitecube1:
 			sub ecx, 1
@@ -821,9 +811,7 @@ playWhiteSoldiers PROC
 			sub WhitesEat, 1
 			add white[edx*4], 1
 			sub TurnsForCube1, 1
-			cmp TurnsForCube1, 0
-			jg checkSoldiersWhiteCube1
-			ret
+			jmp checkSoldiersWhiteCube2
 		
 			eatfromeatenblack2:
 			add BlackEat, 1
@@ -831,9 +819,7 @@ playWhiteSoldiers PROC
 			add white[edx*4] , 1
 			sub WhitesEat, 1
 			sub TurnsForCube1, 1
-			cmp TurnsForCube1, 0
-			jg checkSoldiersWhiteCube1
-			ret 
+			jmp checkSoldiersWhiteCube2
 	
 	
 	
