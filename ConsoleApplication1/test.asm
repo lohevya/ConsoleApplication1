@@ -772,9 +772,11 @@ playWhiteSoldiers PROC
 			sub ebx, 1
 			cmp ebx, 18
 			jl procceseatenwhitecube1
+			push edx
 			mov edx, ebx
 			sub edx, eax
 			mov eax, edx
+			pop edx
 			;sub eax, edx
 			cmp black[eax*4] , 1
 			jg procceseatenwhitecube1
@@ -799,11 +801,11 @@ playWhiteSoldiers PROC
 			sub ecx, 1
 			cmp ecx, 18
 			jl getoutwhite
+			push eax
 			mov eax, ecx
 			sub eax, edx
 			mov edx, eax
-			;mov edx, 23
-			;sub edx, eax
+			pop eax
 			cmp black[edx*4] , 1
 			jg getoutwhite
 			cmp black[edx*4] , 1
