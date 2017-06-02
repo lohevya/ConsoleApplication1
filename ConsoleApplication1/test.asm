@@ -372,6 +372,8 @@ rollCube PROC
 	mov bl, 6
 	div bl
 	mov cubeValue2, ah
+
+	mov cubeValue2, 5
 	ret
 rollCube ENDP
 
@@ -667,8 +669,9 @@ playWhiteSoldiers PROC
 		jg moveSoldiersWhiteCube2
 		jmp checkSoldiersWhiteCube2
 	moveSoldiersWhiteCube2:
+		mov al, cubeValue2
 		add eax, 1
-		push edx
+		push edx 
 		mov edx, ebx
 		sub edx, eax
 		mov eax, edx
@@ -707,7 +710,8 @@ playWhiteSoldiers PROC
 		jg moveSoldiersWhiteCube1
 		jmp checkSoldiersWhiteCube1
 	moveSoldiersWhiteCube1:
-		add edx, 1
+		mov dl, cubeValue1
+ 		add edx, 1
 		push eax
 		mov eax, ecx
 		sub eax, edx
@@ -777,7 +781,6 @@ playWhiteSoldiers PROC
 			sub edx, eax
 			mov eax, edx
 			pop edx
-			;sub eax, edx
 			cmp black[eax*4] , 1
 			jg procceseatenwhitecube1
 			cmp black[eax*4] , 1
@@ -789,7 +792,7 @@ playWhiteSoldiers PROC
 			jg procceseatenwhitecube1
 			jmp checkSoldiersWhiteCube2
 
-			eatfromeatenblack1:
+		eatfromeatenblack1:
 			add BlackEat, 1
 			sub black[eax*4] , 1
 			add white[eax*4] , 1
@@ -815,13 +818,13 @@ playWhiteSoldiers PROC
 			sub TurnsForCube1, 1
 			jmp checkSoldiersWhiteCube2
 		
-			eatfromeatenblack2:
-			add BlackEat, 1
-			sub black[edx*4] , 1
-			add white[edx*4] , 1
-			sub WhitesEat, 1
-			sub TurnsForCube1, 1
-			jmp checkSoldiersWhiteCube2
+	eatfromeatenblack2:
+		add BlackEat, 1
+		sub black[edx*4] , 1
+		add white[edx*4] , 1
+		sub WhitesEat, 1
+		sub TurnsForCube1, 1
+		jmp checkSoldiersWhiteCube2
 	
 	
 	
