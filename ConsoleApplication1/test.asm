@@ -33,6 +33,8 @@ pngCube3 BYTE "3.bmp",0
 pngCube4 BYTE "4.bmp",0
 pngCube5 BYTE "5.bmp",0
 pngCube6 BYTE "6.bmp",0
+pngRed BYTE "red.bmp",0
+pngDer BYTE "der.bmp",0
 pngBlackWin BYTE "blackWin.bmp",0
 pngWhiteWin BYTE "whiteWin.bmp",0
 objBoard Img <0,0,0,0>
@@ -44,6 +46,8 @@ objCube5 Img <0,0,0,0>
 objCube6 Img <0,0,0,0>
 objBlack Img <0,0,0,0>
 objWhite Img <0,0,0,0>
+objRed Img <0,0,0,0>
+objDer Img <0,0,0,0>
 objBlackWin Img <0,0,0,0>
 objWhiteWin Img <0,0,0,0>
 white DWORD 0,0,0,0,0,5,0,3,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,2
@@ -79,7 +83,162 @@ localTime LPSYSTEMTIME <>
 
 .code
 
+drawRed PROC
+	
+	mov edx, 0
+	mov eax, 0
+	checkred1:
+		cmp eax, 6
+		je checkred2
+		mov ecx, black[eax*4]
+		mov ebx, 1
+		imul ebx, 68
+		mov edx, eax
+		imul edx, -127
+		add edx, 1658
+		mov dstX1, edx
+		cmp ecx, 1
+		jg drawred1
+		
+		mov ecx, white[eax*4]
+		mov ebx, ecx
+		mov ebx, 1
+		imul ebx, 68
+		mov edx, eax
+		imul edx, -127
+		add edx, 1658
+		mov dstX1, edx
+		cmp ecx, 1
+		jg drawred1
+		add eax,1
+		jmp checkred1
+	drawred1:
+		push eax
+		invoke drd_imageDraw, offset objDer, dstX1, ebx
+		pop eax
+		add eax, 1
+		jmp checkred1		
+	
+	checkred2:
+		cmp eax, 12
+		je checkred3
+		mov ecx, black[eax*4]
+		mov ebx, ecx
+		mov ebx, 1
+		imul ebx, 68
+		mov edx, eax
+		sub edx, 6
+		imul edx, -127
+		add edx, 758
+		mov dstX1, edx
+		cmp ecx, 1
+		jg drawred2
+	
+		mov ecx, white[eax*4]
+		mov ebx, ecx
+		mov ebx, 1
+		imul ebx, 68
+		mov edx, eax
+		sub edx, 6
+		imul edx, -127
+		add edx, 758
+		mov dstX1, edx
+		cmp ecx, 1
+		jg drawred2
+		add eax, 1
+		jmp checkred2
+	drawred2:
+		push eax
+		invoke drd_imageDraw, offset objDer, dstX1, ebx
+		pop eax
+		add eax, 1
+		jmp checkred2		
 
+
+	checkred3:
+		cmp eax, 18
+		je checkred4
+		mov ecx, black[eax*4]
+		mov ebx, ecx
+		mov dstY1, 1005
+		sub dstY1, ebx
+		sub dstY1, 394
+		mov ebx, dstY1
+		mov edx, eax
+		sub edx, 12
+		imul edx, 127
+		add edx, 123
+		mov dstX1, edx
+		cmp ecx, 1
+		jg drawred3
+		
+		
+		mov ecx, white[eax*4]
+		mov ebx, ecx
+		mov dstY1, 1005
+		sub dstY1, ebx
+		sub dstY1, 394
+		mov ebx, dstY1
+		mov edx, eax
+		sub edx, 12
+		imul edx, 127
+		add edx, 123
+		mov dstX1, edx
+		cmp ecx, 1
+		jg drawred3
+		add eax, 1
+		jmp checkred3
+	drawred3:
+		push eax
+	invoke drd_imageDraw, offset objRed, dstX1, ebx
+		pop eax
+		add eax, 1
+		jmp checkred3		
+	
+	
+	checkred4:
+		cmp eax, 24
+		je exitred
+		mov ecx, black[eax*4]
+		mov ebx, ecx
+		mov dstY1, 1005
+		sub dstY1, ebx
+		sub dstY1, 394
+		mov ebx, dstY1
+		mov edx, eax
+		sub edx, 18
+		imul edx, 127
+		add edx, 1023
+		mov dstX1, edx
+		cmp ecx, 1
+		jg drawred4
+		
+		mov ecx, white[eax*4]
+		mov ebx, ecx
+		mov dstY1, 1005
+		sub dstY1, ebx
+		sub dstY1, 394
+		mov ebx, dstY1
+		mov edx, eax
+		sub edx, 18
+		imul edx, 127
+		add edx, 1023
+		mov dstX1, edx
+		cmp ecx, 1
+		jg drawred4
+		add eax,1
+		jmp checkred4
+	drawred4:
+		push eax
+	invoke drd_imageDraw, offset objRed, dstX1, ebx
+		add ebx, 75
+		pop eax
+		add eax, 1
+		jmp checkred4		
+
+	exitred:
+		ret
+drawRed ENDP
 
 drawBlackSoldiers PROC
 	
@@ -372,8 +531,6 @@ rollCube PROC
 	mov bl, 6
 	div bl
 	mov cubeValue2, ah
-
-	mov cubeValue2, 5
 	ret
 rollCube ENDP
 
@@ -464,6 +621,7 @@ drawCube PROC
 drawCube ENDP
 	
 drawsoldiers PROC
+	invoke drawRed
 	invoke drawBlackSoldiers
 	invoke drawWhiteSoldiers
 	invoke drawCube
@@ -886,7 +1044,6 @@ drawMessages PROC
 		ret
 drawMessages ENDP
 main proc
-	;mov BlackEat, 2
 	invoke drd_init, 1920, 1080, 0
 	invoke rollCube
 	invoke drd_imageLoadFile,offset pngBoard, offset objBoard
@@ -898,6 +1055,8 @@ main proc
 	invoke drd_imageLoadFile,offset pngCube6, offset objCube6
 	invoke drd_imageLoadFile,offset pngBlack, offset objBlack
 	invoke drd_imageLoadFile,offset pngWhite, offset objWhite
+	invoke drd_imageLoadFile,offset pngRed, offset objRed
+	invoke drd_imageLoadFile,offset pngDer, offset objDer
 	invoke drd_imageLoadFile,offset pngBlackWin, offset objBlackWin
 	invoke drd_imageLoadFile,offset pngWhiteWin, offset objWhiteWin
 	loopa:
